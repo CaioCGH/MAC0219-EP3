@@ -148,6 +148,11 @@ int main(int argc, char *argv[])
 	int n = width*height;
 	cudaSetDevice(1);
 
+	MPI_Init(&argc, &argv);
+	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+	MPI_Get_processor_name(processor_name, &name_len);
+
 	float *buffer;
 	float *d_buffer;
 
@@ -158,8 +163,6 @@ int main(int argc, char *argv[])
 
 	cudaMemcpy(d_buffer, buffer, n * sizeof(float), cudaMemcpyHostToDevice);
 
-	struct timeval start, end;
-	gettimeofday(&start, NULL);
 
   	GPUimage<<<n/threads, threads>>>(d_buffer, width, height, a_0, b_0, a_1, b_1, maxInteration);
 	cudaMemcpy(buffer, d_buffer, n * sizeof(float), cudaMemcpyDeviceToHost);
