@@ -76,7 +76,7 @@ __global__
 
 	int x;
 	int y = threadIdx.x + blockIdx.x *blockDim.x;
-	if(for (y = y_0; y < y_f; y++){
+	for (y = y_0; y < y_f; y++){
 		//calculamos o valor de b do c para esta linha de  pixels
 		float C_b = b_0 + (b_1-b_0)/height*y;
 
@@ -109,10 +109,10 @@ __global__
 	}
 }
 
-__global__
 void scale_Buffer(float *buffer, int n, float min, float max){
-	int index = threadIdx.x + blockIdx.x * blockDim.x;
-	buffer[index] = (buffer[index] - min) / (max - min);
+	int i;
+	for(i = 0; i <n; i++)
+		buffer[i] = (buffer[i] - min) / (max - min);
 }
 
 void get_Buffer_Extremes(float* buffer, int maxIteration, int n, int threads, float* min, float* max){
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 	float b_1 = atof(argv[4]);
 	int   width   = atoll(argv[5]);
 	int   height  = atoll(argv[6]);
-	int maxInteration = 200;
+	int maxIteration = 200;
 	int threads   = atoll(argv[8]);
 	char* saida    = argv[9];
 	int n = width*height;
@@ -155,7 +155,6 @@ int main(int argc, char *argv[])
 	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 	MPI_Get_processor_name(processor_name, &name_len);
-	int chunk_size= n/world_size;
 	int chunk_height = height/world_size;
 	int chunk_size = chunk_height*width;
 
@@ -166,7 +165,7 @@ int main(int argc, char *argv[])
 
 	buffer = (float*) malloc(n * sizeof(float));
 	d_buffer = (float*) malloc(chunk_size * sizeof(float));
-	*host_partial_buffer; = (float*) malloc(chunk_size * sizeof(float));
+	host_partial_buffer = (float*) malloc(chunk_size * sizeof(float));
 
 
 	cudaMallocManaged(&d_buffer, chunk_size *sizeof(float));
@@ -174,11 +173,11 @@ int main(int argc, char *argv[])
 	cudaMemcpy(host_partial_buffer, d_buffer, chunk_size * sizeof(float), cudaMemcpyHostToDevice);
 
 
-  	GPUimage<<<n/world_size/threads, threads>>>(d_buffer, chunk_size, chunk_height*(world_rank), chunk_height*(world_rank+1), width, height, a_0, b_0, a_1, b_1, maxInteration, world_rank);
+  	GPUimage<<<n/world_size/threads, threads>>>(d_buffer, chunk_size, chunk_height*(world_rank), chunk_height*(world_rank+1), width, height, a_0, b_0, a_1, b_1, maxIteration, world_rank);
 
 	cudaMemcpy(host_partial_buffer, d_buffer, chunk_size * sizeof(float), cudaMemcpyDeviceToHost);
 
-	scale_Buffer(host_partial_buffer, n, 0, maxIteration);
+	scale_Buffer(host_partial_buffer, chunk_size, 0, maxIteration);
 
 	MPI_Gather(host_partial_buffer, chunk_size, MPI_FLOAT, buffer, chunk_size, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
