@@ -11,7 +11,7 @@ mandelbrotCPU: mandelbrotCPU.c
 
 
 mandelbrotGPU: mandelbrotGPU.cu
-	nvcc ${MPIGLFAGS} -L/apps/CUDA/cuda-5.0/lib64/ -o mandelbrotGPU
+	nvcc ${MPIGLFAGS} -L/apps/CUDA/cuda-5.0/lib64/ -o mandelbrotGPU mandelbrotGPU.cu -lm -lpng
 
 teste: teste.c
 	mpicc -o teste teste.c -lm -lpng -lmpi

@@ -12,6 +12,7 @@
 #include <sys/time.h>
 #include <string.h>
 #include <cuda.h>
+#include <mpi.h>
 
 
 void setRGB(png_byte *ptr, float val){
@@ -148,6 +149,10 @@ int main(int argc, char *argv[])
 	int n = width*height;
 	cudaSetDevice(1);
 
+    int world_size;
+    int world_rank;
+    char processor_name[MPI_MAX_PROCESSOR_NAME];
+    int name_len;
 	MPI_Init(&argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
@@ -187,12 +192,12 @@ int main(int argc, char *argv[])
 
 	cudaFree(d_buffer);
 	free(buffer);
-
+    /*
 	gettimeofday(&end, NULL);
 	double elapsed_time = (end.tv_sec - start.tv_sec) +
                               (end.tv_usec - start.tv_usec) / 1000000.0;
 
 	printf("%.4f\n", elapsed_time);
-
+    */
 	return 0;
 }
