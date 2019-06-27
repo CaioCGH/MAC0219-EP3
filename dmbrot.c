@@ -42,18 +42,6 @@ int main(int argc, char *argv[])
 			system(cmd);
             free(cmd);
         }
-		if(strcmp(mode, "test") == 0){
-			printf("AAAAAAAAAAAAAAAAAAA\n");
-			char *argv2[5] = {"mpiexec", "-np", argv[8], "teste", argv[1]};
-            char *cmd = (char *) malloc(1000 * sizeof(char));
-            for(i = 0; i < 5; i++){
-                strcat(cmd, argv2[i]);
-                strcat(cmd, " ");
-            }
-			printf("%s\n", cmd);
-            system(cmd);
-            free(cmd);
-		}
     }
     else{
        waitpid(pid,0,0);
