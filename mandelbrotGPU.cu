@@ -199,5 +199,6 @@ int main(int argc, char *argv[])
 
 	printf("%.4f\n", elapsed_time);
     */
+    MPI_Finalize();
 	return 0;
 }
